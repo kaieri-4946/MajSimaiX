@@ -122,7 +122,7 @@ namespace MajSimai
             //var newNoteContent = noteContents.ToList();
             //newNoteContent.RemoveAt(0);
             ////删除第一个NOTE
-
+            var isNonCTouchSlide = note1.TouchArea != ' ' && note1.TouchArea != 'C';
             for (var i = 1; i < ranges.Length; i++)
             {
                 var partNoteText = content[ranges[i]];
@@ -131,8 +131,8 @@ namespace MajSimai
                 {
                     rentedArray[0] = content[ranges[0]][0];
                     var noteText = rentedArray.AsSpan();
-                    partNoteText.CopyTo(noteText.Slice(1));
-                    noteText = noteText.Slice(0, partNoteText.Length + 1);
+                    partNoteText.CopyTo(noteText.Slice(isNonCTouchSlide ? 2 : 1));
+                    noteText = noteText.Slice(0, partNoteText.Length + (isNonCTouchSlide ? 2 : 1));
 
                     if (TryGetSingleNote(timing, bpm, noteText, out var note2))
                     {
@@ -182,7 +182,7 @@ namespace MajSimai
                 }
                 else 
                 {
-                    simaiNote.StartPosition = 8;
+                    simaiNote.StartPosition = 1;
                 }
                 simaiNote.Type = SimaiNoteType.Touch;
             }
@@ -645,7 +645,9 @@ namespace MajSimai
                             case 'C':
                             case 'D':
                             case 'E':
-                                isTouchNote = true;
+                                // If already a slide, then it's not marked as touch
+                                if(!isSlide)
+                                    isTouchNote = true;
                                 break;
                             case 'f':
                                 isHanabi = true;
