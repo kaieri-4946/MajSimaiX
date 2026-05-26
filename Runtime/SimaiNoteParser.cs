@@ -219,7 +219,7 @@ namespace MajSimai
                 else
                 {
                     simaiNote.Type = SimaiNoteType.Hold;
-                    if (noteTextCopy[^1] == 'h')
+                    if (noteTextCopy.IndexOf("h[") == -1)
                     {
                         simaiNote.HoldTime = 0;
                     }
@@ -245,6 +245,11 @@ namespace MajSimai
                 if(!NoteHelper.TryGetSlideParams(bpm, noteTextCopy, out var slideParams))
                 {
                     return false;
+                }
+                slideParams.slideTime -= simaiNote.HoldTime;
+                if(detectResult.IsHold && simaiNote.HoldTime == 0)
+                {
+                    simaiNote.HoldTime = 60 / bpm;
                 }
                 var (slideWaitTime, slideTime) = slideParams;
                 simaiNote.SlideTime = slideTime;
